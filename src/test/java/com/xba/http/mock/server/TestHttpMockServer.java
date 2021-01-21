@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.xba.http.mock;
+package com.xba.http.mock.server;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -32,7 +32,7 @@ import java.util.Map;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-class HttpMockServerTest {
+class TestHttpMockServer {
 
   private HttpMockServer httpMockServer;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.xba.http.mock;
+package com.xba.http.mock.server;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.mockserver.integration.ClientAndServer;

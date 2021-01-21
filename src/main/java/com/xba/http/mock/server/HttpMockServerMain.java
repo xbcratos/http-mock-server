@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package com.xba.http.mock;
+package com.xba.http.mock.server;
 
+import com.xba.http.mock.bean.Request;
+import com.xba.http.mock.json.JsonRequestsReader;
+import com.xba.http.mock.json.RequestsJson;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -44,7 +49,7 @@ public class HttpMockServerMain {
     System.exit(0);
   }
 
-  private static void runMainLoop() {
+  private static void runMainLoop() throws IOException {
     int option = printOptions();
     while (option != 3) {
       switch (option) {
@@ -55,6 +60,7 @@ public class HttpMockServerMain {
           logger.info("Mocking requests");
           httpMockServer.mockRequests(getRequestsToMock());
           logger.info("mock server started");
+          logger.info("running on http://localhost:1080");
           break;
         case 2:
           logger.info("Stopping mock server");
@@ -93,18 +99,25 @@ public class HttpMockServerMain {
     return -1;
   }
 
-  private static Map<HttpRequest, HttpResponse> getRequestsToMock() {
+  private static Map<HttpRequest, HttpResponse> getRequestsToMock() throws IOException {
+    // currently returning example requests json. TODO read json file path from console
     Map<HttpRequest, HttpResponse> requestsToMock = new HashMap<>();
 
-    requestsToMock.put(
-        request().withMethod("GET").withPath("/test2"),
-        response().withStatusCode(200).withBody("Successful test with java mock server app")
-    );
-    requestsToMock.put(request().withMethod("POST").withPath("/login").withBody("{username: 'foo', password: 'bar'}"),
-        response().withStatusCode(302)
-                  .withCookie("sessionId", "2By8LOhBmaW5nZXJwcmludCIlMDAzMW")
-                  .withHeader("Location", "https://www.mock-server.com")
-    );
+    RequestsJson requestsJson = new JsonRequestsReader("src/main/resources/RequestsExample.json").readRequestsJson();
+    if (requestsJson != null) {
+      List<Request> requestsList = requestsJson.getRequests();
+      if (requestsList != null) {
+        requestsList.forEach(request -> {
+          requestsToMock.put(
+              request().withMethod(request.getMethod())
+                       .withPath(request.getPath())
+                       .withBody(request.getBody()),
+              response().withStatusCode(request.getResponse().getStatusCode())
+                        .withBody(request.getResponse().getBody())
+          );
+        });
+      }
+    }
 
     return requestsToMock;
   }

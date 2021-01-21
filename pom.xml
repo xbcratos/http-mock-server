@@ -26,8 +26,9 @@
   <properties>
     <jdk.version>1.8</jdk.version>
     <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
-    <fully.qualified.main.class>com.xba.http.mock.HttpMockServerMain</fully.qualified.main.class>
+    <fully.qualified.main.class>com.xba.http.mock.server.HttpMockServerMain</fully.qualified.main.class>
     <mockserver.version>5.11.1</mockserver.version>
+    <jackson.version>2.11.0</jackson.version>
     <junit5.version>5.7.0</junit5.version>
   </properties>
 
@@ -36,6 +37,11 @@
       <groupId>org.mock-server</groupId>
       <artifactId>mockserver-netty</artifactId>
       <version>${mockserver.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
     </dependency>
 
     <!-- Test dependencies -->
