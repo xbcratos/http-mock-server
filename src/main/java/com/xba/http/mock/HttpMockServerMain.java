@@ -16,8 +16,16 @@
 
 package com.xba.http.mock;
 
+import org.mockserver.model.HttpRequest;
+import org.mockserver.model.HttpResponse;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Logger;
+
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
 
 public class HttpMockServerMain {
 
@@ -45,7 +53,7 @@ public class HttpMockServerMain {
           logger.info("Starting mock server");
           httpMockServer.startServer();
           logger.info("Mocking requests");
-          httpMockServer.mockRequests();
+          httpMockServer.mockRequests(getRequestsToMock());
           logger.info("mock server started");
           break;
         case 2:
@@ -83,6 +91,22 @@ public class HttpMockServerMain {
     }
 
     return -1;
+  }
+
+  private static Map<HttpRequest, HttpResponse> getRequestsToMock() {
+    Map<HttpRequest, HttpResponse> requestsToMock = new HashMap<>();
+
+    requestsToMock.put(
+        request().withMethod("GET").withPath("/test2"),
+        response().withStatusCode(200).withBody("Successful test with java mock server app")
+    );
+    requestsToMock.put(request().withMethod("POST").withPath("/login").withBody("{username: 'foo', password: 'bar'}"),
+        response().withStatusCode(302)
+                  .withCookie("sessionId", "2By8LOhBmaW5nZXJwcmludCIlMDAzMW")
+                  .withHeader("Location", "https://www.mock-server.com")
+    );
+
+    return requestsToMock;
   }
 
 }

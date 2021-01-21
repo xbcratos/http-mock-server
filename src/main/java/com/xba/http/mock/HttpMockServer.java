@@ -16,21 +16,23 @@
 
 package com.xba.http.mock;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.mockserver.integration.ClientAndServer;
+import org.mockserver.model.HttpRequest;
+import org.mockserver.model.HttpResponse;
+
+import java.util.Map;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
 public class HttpMockServer {
+
   private ClientAndServer mockServer;
 
   public HttpMockServer() {
     this.mockServer = null;
-  }
-
-  public ClientAndServer getMockServer() {
-    return mockServer;
   }
 
   public void startServer() {
@@ -39,23 +41,37 @@ public class HttpMockServer {
     }
   }
 
+  @VisibleForTesting
+  ClientAndServer getMockServer() {
+    return mockServer;
+  }
+
   /**
    * Mocks requests the http mock server will respond to.
    * More info on mocking requests at: https://www.mock-server.com/mock_server/getting_started.html
+   * @param requestsToMock
    */
-  public void mockRequests() {
-    this.mockServer.when(request().withMethod("GET").withPath("/test2"))
-                   .respond(response().withStatusCode(200).withBody("Successful test with java mock server app"));
-    this.mockServer.when(request().withMethod("POST").withPath("/login").withBody("{username: 'foo', password: 'bar'}"))
-                   .respond(response().withStatusCode(302)
-                                      .withCookie("sessionId", "2By8LOhBmaW5nZXJwcmludCIlMDAzMW")
-                                      .withHeader("Location", "https://www.mock-server.com"));
+  public void mockRequests(Map<HttpRequest, HttpResponse> requestsToMock) {
+    if (isRunning()) {
+      requestsToMock.forEach((httpRequest, httpResponse) -> this.mockServer.when(httpRequest).respond(httpResponse));
+    }
   }
 
   public void stopServer() {
     if (this.mockServer != null && this.mockServer.isRunning()) {
       this.mockServer.stop();
     }
+  }
+
+  public boolean isRunning() {
+    if (mockServer != null) {
+      return mockServer.isRunning();
+    }
+    return false;
+  }
+
+  public boolean isStopped() {
+    return !isRunning();
   }
 
 }
