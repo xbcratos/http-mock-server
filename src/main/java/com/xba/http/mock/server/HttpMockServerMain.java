@@ -58,7 +58,7 @@ public class HttpMockServerMain {
           logger.info("Starting mock server");
           httpMockServer.startServer();
           logger.info("Mocking requests");
-          httpMockServer.mockRequests(getRequestsToMock());
+          httpMockServer.mockRequests(getRequestsToMock(printGetFileOption()));
           logger.info("mock server started");
           logger.info("running on http://localhost:1080");
           break;
@@ -90,6 +90,11 @@ public class HttpMockServerMain {
     }
   }
 
+  private static String printGetFileOption() {
+    System.out.println("Insert path of requests json file:");
+    return getNextString();
+  }
+
   private static int getNextInt() {
     Scanner sc = new Scanner(System.in);
     if (sc.hasNextInt()) {
@@ -99,11 +104,19 @@ public class HttpMockServerMain {
     return -1;
   }
 
-  private static Map<HttpRequest, HttpResponse> getRequestsToMock() throws IOException {
-    // currently returning example requests json. TODO read json file path from console
+  private static String getNextString() {
+    Scanner sc = new Scanner(System.in);
+    if (sc.hasNextLine()) {
+      return sc.nextLine();
+    }
+
+    return "";
+  }
+
+  private static Map<HttpRequest, HttpResponse> getRequestsToMock(String requestsJsonFilePath) throws IOException {
     Map<HttpRequest, HttpResponse> requestsToMock = new HashMap<>();
 
-    RequestsJson requestsJson = new JsonRequestsReader("src/main/resources/RequestsExample.json").readRequestsJson();
+    RequestsJson requestsJson = new JsonRequestsReader(requestsJsonFilePath).readRequestsJson();
     if (requestsJson != null) {
       List<Request> requestsList = requestsJson.getRequests();
       if (requestsList != null) {
